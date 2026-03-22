@@ -1,32 +1,20 @@
-// script.js
-// Complete restaurant ordering system - all functionality in one file
-
-// Menu data - organized by category
 const menuData = {
     mains: [
         { id: 1, name: "Chicken Biriyani", price: 18.99, desc: "A royal blend of flavorful rice, marinated chicken, and authentic biryani spices", img: "r2.jpg" },
         { id: 2, name: "Naan and Panneer Butter Masala", price: 24.99, desc: "A perfect combo of soft naan and rich paneer butter masala.", img: "r3.jpg" },
-        { id: 3, name: "Veg Full Meals", price: 16.99, desc: "A wholesome South Indian vegetarian platter with multiple dishes.", img: "vegfull.jpg" },
-        
     ],
     desserts: [
         { id: 4, name: "Chocolate Lava Cake", price: 8.99, desc: "Warm chocolate cake with molten center, served with vanilla ice cream.", img: "choco.jpg" },
         { id: 5, name: "Tiramisu", price: 7.99, desc: "Classic Italian coffee-flavored dessert with mascarpone cream.", img: "tira.jpg" },
         { id: 6, name: "Cheesecake", price: 6.99, desc: "New York style cheesecake with berry compote.", img: "cheese.jpg" },
-        
     ],
     drinks: [
-        
         { id: 8, name: "Mojito", price: 9.99, desc: "Classic mint, lime, and rum cocktail.", img: "blue.jpg" },
         { id: 9, name: "Fresh Lemonade", price: 4.99, desc: "House-made with fresh lemons and mint.", img: "lemonade.jpg" },
         { id: 10, name: "Iced Tea", price: 3.99, desc: "Refreshing peach iced tea.", img: "ice.jpg" }
     ]
 };
-
-// Shopping cart state
 let cart = JSON.parse(localStorage.getItem('gourmetCart')) || [];
-
-// Initialize app
 document.addEventListener('DOMContentLoaded', function() {
     initNavigation();
     renderMenu();
@@ -34,8 +22,6 @@ document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
     loadCartFromStorage();
 });
-
-// Navigation functions
 function initNavigation() {
     const hamburger = document.querySelector('.hamburger');
     const navMenu = document.querySelector('.nav-menu');
@@ -44,23 +30,17 @@ function initNavigation() {
         hamburger.classList.toggle('active');
         navMenu.classList.toggle('active');
     });
-
-    // Smooth scrolling for nav links
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const targetId = link.getAttribute('href').substring(1);
             scrollToSection(targetId);
-            // Close mobile menu
             hamburger.classList.remove('active');
             navMenu.classList.remove('active');
-            // Update active link
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
             link.classList.add('active');
         });
     });
-
-    // Navbar scroll effect
     window.addEventListener('scroll', () => {
         const navbar = document.querySelector('.navbar');
         if (window.scrollY > 50) {
@@ -70,7 +50,6 @@ function initNavigation() {
         }
     });
 }
-
 function scrollToSection(sectionId) {
     const element = document.getElementById(sectionId);
     if (element) {
@@ -81,23 +60,15 @@ function scrollToSection(sectionId) {
         });
     }
 }
-
-// Menu rendering and tab functionality
 function renderMenu() {
     const menuGrid = document.querySelector('#mains');
     const mainsHtml = menuData.mains.map(item => createMenuItemHtml(item)).join('');
     menuGrid.innerHTML = mainsHtml;
-
-    // Tab functionality
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const tab = e.target.dataset.tab;
-            
-            // Update active tab
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             e.target.classList.add('active');
-            
-            // Render selected tab content
             const grid = document.querySelector('.menu-grid');
             const itemsHtml = menuData[tab].map(item => createMenuItemHtml(item)).join('');
             grid.innerHTML = itemsHtml;
@@ -105,7 +76,6 @@ function renderMenu() {
         });
     });
 }
-
 function createMenuItemHtml(item) {
     return `
         <div class="menu-item" data-id="${item.id}" data-name="${item.name}" data-price="${item.price}" data-desc="${item.desc}">
@@ -121,34 +91,25 @@ function createMenuItemHtml(item) {
         </div>
     `;
 }
-
-// Cart functionality
 function addToCart(id, name, price, desc, img) {
-    // Check if item already exists in cart
     const existingItem = cart.find(item => item.id === id);
-    
     if (existingItem) {
         existingItem.quantity += 1;
     } else {
         cart.push({ id, name, price, desc, img, quantity: 1 });
     }
-    
     saveCart();
     updateCartCount();
     updateOrderTotal();
-    
-    // Visual feedback
     const btn = event.target.closest('.add-btn');
     const originalText = btn.innerHTML;
     btn.innerHTML = '<i class="fas fa-check"></i> Added!';
     btn.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
-    
     setTimeout(() => {
         btn.innerHTML = originalText;
         btn.style.background = 'linear-gradient(135deg, #d4a574, #c8956a)';
     }, 1500);
 }
-
 function removeFromCart(id) {
     cart = cart.filter(item => item.id !== id);
     saveCart();
@@ -156,7 +117,6 @@ function removeFromCart(id) {
     updateCartCount();
     updateOrderTotal();
 }
-
 function updateQuantity(id, change) {
     const item = cart.find(item => item.id === id);
     if (item) {
@@ -171,30 +131,25 @@ function updateQuantity(id, change) {
         }
     }
 }
-
 function saveCart() {
     localStorage.setItem('gourmetCart', JSON.stringify(cart));
 }
-
 function loadCartFromStorage() {
     cart = JSON.parse(localStorage.getItem('gourmetCart')) || [];
     renderCart();
     updateCartCount();
     updateOrderTotal();
 }
-
 function updateCartCount() {
     const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
     document.getElementById('cart-count').textContent = totalItems;
 }
-
 function renderCart() {
     const cartItems = document.getElementById('cart-items');
     if (cart.length === 0) {
         cartItems.innerHTML = '<div style="padding: 2rem; text-align: center; color: #666;"><i class="fas fa-shopping-cart" style="font-size: 3rem; margin-bottom: 1rem;"></i><p>Your cart is empty</p></div>';
         return;
     }
-
     const cartHtml = cart.map(item => `
         <div class="cart-item">
             <img src="${item.img}" alt="${item.name}">
@@ -211,27 +166,21 @@ function renderCart() {
                 <i class="fas fa-trash"></i> Remove
             </button>
         </div>
-    `).join('');
-    
+    `).join(''); 
     cartItems.innerHTML = cartHtml;
 }
-
 function updateCartSummary() {
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
     const tax = subtotal * 0.10;
-    const total = subtotal + tax;
-    
+    const total = subtotal + tax; 
     document.getElementById('cart-subtotal').textContent = `$${subtotal.toFixed(2)}`;
     document.getElementById('cart-tax').textContent = `$${tax.toFixed(2)}`;
-    document.getElementById('cart-total').textContent = `$${total.toFixed(2)}`;
-    
+    document.getElementById('cart-total').textContent = `$${total.toFixed(2)}`; 
     return total;
 }
-
 function updateOrderTotal() {
     const total = updateCartSummary();
-    document.getElementById('order-total').textContent = total.toFixed(2);
-    
+    document.getElementById('order-total').textContent = total.toFixed(2); 
     const placeOrderBtn = document.getElementById('place-order-btn');
     if (cart.length === 0) {
         placeOrderBtn.disabled = true;
@@ -241,18 +190,14 @@ function updateOrderTotal() {
         placeOrderBtn.innerHTML = `Place Order - $${total.toFixed(2)}`;
     }
 }
-
-// Modal controls
 function openCart() {
     document.getElementById('cart-modal').style.display = 'block';
     renderCart();
     updateCartSummary();
 }
-
 function closeCart() {
     document.getElementById('cart-modal').style.display = 'none';
 }
-
 function closeSuccess() {
     document.getElementById('success-modal').style.display = 'none';
     cart = [];
@@ -261,25 +206,18 @@ function closeSuccess() {
     updateOrderTotal();
     renderCart();
 }
-
-// Event listeners setup
 function setupEventListeners() {
-    // Cart modal triggers
     document.getElementById('cart-count').addEventListener('click', (e) => {
         e.stopPropagation();
         openCart();
-    });
-    
+    });  
     document.querySelector('.nav-link[href="#cart"]').addEventListener('click', (e) => {
         e.preventDefault();
         openCart();
     });
-    
-    // Close modals on outside click
     window.addEventListener('click', (e) => {
         const cartModal = document.getElementById('cart-modal');
         const successModal = document.getElementById('success-modal');
-        
         if (e.target === cartModal) {
             closeCart();
         }
@@ -287,32 +225,21 @@ function setupEventListeners() {
             closeSuccess();
         }
     });
-
-    // Order form submission
     document.getElementById('order-form').addEventListener('submit', (e) => {
         e.preventDefault();
-        
-        // Validate form
         const name = document.getElementById('customer-name').value.trim();
         const phone = document.getElementById('phone').value.trim();
         const address = document.getElementById('address').value.trim();
-        
         if (!name || !phone || !address || cart.length === 0) {
             alert('Please fill all required fields and add items to cart.');
             return;
         }
-        
-        // Validate phone format (India)
         const phoneRegex = /^[6-9]\d{9}$/;
         if (!phoneRegex.test(phone.replace(/[\s-]/g, ''))) {
             alert('Please enter a valid 10-digit phone number.');
             return;
         }
-        
-        // Show success
         document.getElementById('success-modal').style.display = 'block';
-        
-        // Log order for demo (in production, send to backend)
         const orderData = {
             items: cart,
             customer: {
@@ -326,13 +253,9 @@ function setupEventListeners() {
             total: updateCartSummary()
         };
         console.log('Order placed:', orderData);
-        
-        // Reset form
         document.getElementById('order-form').reset();
     });
 }
-
-// Form validation enhancement
 document.querySelectorAll('input[required], textarea[required]').forEach(field => {
     field.addEventListener('blur', function() {
         if (this.value.trim() === '') {
@@ -342,13 +265,10 @@ document.querySelectorAll('input[required], textarea[required]').forEach(field =
         }
     });
 });
-
-// Auto-hide navbar on scroll down (mobile)
 let lastScroll = 0;
 window.addEventListener('scroll', () => {
     const navbar = document.querySelector('.navbar');
     const currentScroll = window.pageYOffset;
-    
     if (currentScroll > lastScroll && currentScroll > 100 && window.innerWidth < 768) {
         navbar.style.transform = 'translateY(-100%)';
     } else {
